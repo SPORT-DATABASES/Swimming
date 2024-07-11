@@ -22,7 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
+
     - name: Get all swimmers info
       run: python get_swimmers_information.py
 
@@ -37,6 +37,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get all results, make zip and update mysql
+      env:
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       run: python swim_load_results_update_mysql.py
 
     - name: Commit swimmers_results.zip

@@ -6,6 +6,7 @@ import json
 import brotli
 import gzip
 import polars as pl
+import pymysql
 import pandas as pd
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
