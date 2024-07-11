@@ -23,28 +23,28 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas requests aiohttp asyncio nest_asyncio tqdm fake-useragent brotli zipfile36
 
-    - name: Run get_all_swimmers.py
-      run: python get_all_swimmers.py
+    - name: Get all swimmers info
+      run: python get_swimmers_information.py
 
     - name: Commit swimmers.csv
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add all_swimmers.csv
-        git commit -m "Update swimmers.csv"
+        git commit -m "Update swimmers information into csv"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Get results
-      run: python get_results.py
+    - name: Get all results, make zip and update mysql
+      run: python swim_load_results_update_mysql.py
 
     - name: Commit swimmers_results.zip
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add swimmers_results.zip
-        git commit -m "Update swimmers_results.zip"
+        git commit -m "Update swimmers_results.zip and update mysql"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
