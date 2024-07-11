@@ -1,0 +1,10 @@
+aiohttp==3.9.5
+Brotli==1.1.0
+fake_useragent==1.4.0
+nest_asyncio==1.6.0
+pandas==2.2.2
+polars==1.1.0
+python-dotenv==1.0.1
+Requests==2.32.3
+SQLAlchemy==2.0.29
+tqdm==4.66.2
