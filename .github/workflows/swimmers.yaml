@@ -1,0 +1,51 @@
+name: Swimmer Data Collection
+
+on:
+  schedule:
+    - cron: '0 4 * * 2' # Runs every Tuesday at 4 AM UTC
+  workflow_dispatch:
+
+jobs:
+  collect-data:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas requests aiohttp asyncio nest_asyncio tqdm fake-useragent brotli zipfile36
+
+    - name: Run get_all_swimmers.py
+      run: python get_all_swimmers.py
+
+    - name: Commit swimmers.csv
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add all_swimmers.csv
+        git commit -m "Update swimmers.csv"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get results
+      run: python get_results.py
+
+    - name: Commit swimmers_results.zip
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add swimmers_results.zip
+        git commit -m "Update swimmers_results.zip"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
