@@ -1,4 +1,3 @@
-
 import os
 import aiohttp
 import asyncio
@@ -183,8 +182,8 @@ async def main():
     # Define the CREATE TABLE statements
     create_table_all_swimmer = '''
     CREATE TABLE IF NOT EXISTS all_swimmer (
-        `id` INT AUTO_INCREMENT PRIMARY KEY,
-        `providerId` VARCHAR(255),
+        `id` INT NOT NULL,
+        `providerId` VARCHAR(255) NOT NULL,
         `firstName` VARCHAR(255),
         `fullName` VARCHAR(255),
         `nationality` VARCHAR(255),
@@ -194,7 +193,8 @@ async def main():
         `lastName` VARCHAR(255),
         `dateOfBirth` DATE,
         `height` FLOAT,
-        `last_updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        `last_updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id`, `providerId`)
     )
     '''
 
@@ -231,6 +231,9 @@ async def main():
         `last_updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
     '''
+
+    # Remove duplicate entries in the DataFrame
+    swimmers_df = swimmers_df.drop_duplicates(subset=['id', 'providerId'])
 
     # Create and insert data into the tables
     create_and_insert_table(swimmers_df, 'all_swimmer', create_table_all_swimmer)
