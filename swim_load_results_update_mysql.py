@@ -55,6 +55,9 @@ csv_file_path = 'all_swimmers.csv'
 swimmers_df = pd.read_csv(csv_file_path)
 swimmer_ids = swimmers_df["id"].tolist()
 
+# Remove duplicate entries in the DataFrame
+swimmers_df = swimmers_df.drop_duplicates(subset=['id', 'providerId'])
+
 # Asynchronous function to fetch results for a single swimmer with retry logic
 async def fetch_results(session, swimmer_id, retries=5, backoff_factor=1.0):
     url = f"https://api.worldaquatics.com/fina/athletes/{swimmer_id}/results"
@@ -231,9 +234,6 @@ async def main():
         `last_updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
     '''
-
-    # Remove duplicate entries in the DataFrame
-    swimmers_df = swimmers_df.drop_duplicates(subset=['id', 'providerId'])
 
     # Create and insert data into the tables
     create_and_insert_table(swimmers_df, 'all_swimmer', create_table_all_swimmer)
