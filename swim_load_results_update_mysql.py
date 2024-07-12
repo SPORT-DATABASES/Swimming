@@ -15,6 +15,8 @@ from tqdm.asyncio import tqdm
 from concurrent.futures import ThreadPoolExecutor
 from fake_useragent import UserAgent
 import nest_asyncio
+import random
+import time
 
 # Apply nest_asyncio to allow nested event loops
 nest_asyncio.apply()
@@ -70,9 +72,9 @@ async def fetch_results(session, swimmer_id, retries=5, backoff_factor=1.0):
                         data = json.loads(decompressed_content)
                         return {"id": swimmer_id, "results": data.get("Results", [])}
                 elif response.status == 429:
-                    retry_after = int(response.headers.get("Retry-After", backoff_factor))
-                    print(f"Rate limited. Retrying after {retry_after} seconds...")
-                    await asyncio.sleep(retry_after)
+                    print("Rate limited. Pausing for 60 seconds and changing header...")
+                    await asyncio.sleep(60)
+                    headers = generate_headers()  # Change headers
                 else:
                     print(f"Failed to retrieve results for swimmer ID {swimmer_id} with status code {response.status}.")
                     return {"id": swimmer_id, "results": [], "status": "failed"}
@@ -102,14 +104,19 @@ async def fetch_all_results(swimmer_ids):
         failed_ids = []
         for i, swimmer_id in enumerate(tqdm(swimmer_ids)):
             if i > 0 and i % 5000 == 0:
-                print(f"Pausing for 30 seconds after {i} requests...")
-                await asyncio.sleep(30)  # Pause for 30 seconds after every 5000 requests
+                pause_duration = random.uniform(30, 60)
+                print(f"Pausing for {pause_duration:.2f} seconds after {i} requests...")
+                await asyncio.sleep(pause_duration)  # Random pause after every 5000 requests
             tasks.append(fetch_results(session, swimmer_id))
             if len(tasks) >= 5000 or i == len(swimmer_ids) - 1:
                 results = await asyncio.gather(*tasks)
                 all_results.extend(results)
                 failed_ids.extend([result["id"] for result in results if result.get("status") == "failed"])
                 tasks = []
+                # Add random pauses between batches
+                pause_duration = random.uniform(1, 5)
+                print(f"Pausing for {pause_duration:.2f} seconds between batches...")
+                await asyncio.sleep(pause_duration)
         return all_results, failed_ids
 
 # Main function to run the asynchronous fetching
